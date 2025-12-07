@@ -1,28 +1,19 @@
 'use client'
 
-import supabase from "./api/lib/db";
-import { Idesc } from "./api/types/desc";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import LoginPage from "./login/page";
 
 export default function Home() {
-  const [ descs, setDescs ] = useState<Idesc[]>([]);
+  const router = useRouter();
 
-  useEffect (() => {
-    const fetchDescs = async () => {
-      const { data, error } = await supabase.from('infoar').select('*');
+  useEffect(() => {
+    // Cek jika user sudah login, redirect ke dashboard
+    const user = sessionStorage.getItem('user');
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [router]); // Remove 'supabase' from dependency
 
-      if (error) console.log ('error: ', error);
-      else setDescs(data);
-    };
-
-    fetchDescs();
-  }, [supabase]);
-
-  console.log(descs);
-  return (
-    <>
-      <LoginPage/>
-    </>
-  );
+  return <LoginPage />;
 }

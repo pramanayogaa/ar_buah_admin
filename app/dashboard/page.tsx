@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Menu, Plus, Edit, Trash2, Save, LogOut } from 'lucide-react';
 import {
@@ -43,6 +43,17 @@ interface QuizData {
 
 type TableData = ModelData | QuizData;
 
+interface FormDataType {
+  name: string;
+  description: string;
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  answer: string;
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -56,7 +67,7 @@ export default function AdminDashboard() {
   const [editMode, setEditMode] = useState(false);
   const [currentItem, setCurrentItem] = useState<TableData | null>(null);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataType>({
     name: '',
     description: '',
     question: '',
@@ -79,13 +90,8 @@ export default function AdminDashboard() {
     }
   }, [router]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchData();
-    }
-  }, [activeMenu, isAuthenticated]);
-
-  const fetchData = async () => {
+  // Fetch Data Function (using useCallback to avoid dependency issues)
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       if (activeMenu === 'model3d') {
@@ -107,7 +113,13 @@ export default function AdminDashboard() {
       console.error('Error:', err);
     }
     setLoading(false);
-  };
+  }, [activeMenu]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated, fetchData]);
 
   const handleLogout = () => {
     if (confirm('Yakin ingin logout?')) {
@@ -126,7 +138,7 @@ export default function AdminDashboard() {
   const handleEdit = (item: TableData) => {
     setEditMode(true);
     setCurrentItem(item);
-    setFormData(item as any);
+    setFormData(item as FormDataType);
     setModalOpen(true);
   };
 
@@ -165,7 +177,7 @@ export default function AdminDashboard() {
       const table = activeMenu === 'model3d' ? 'infoar' : 'quiz';
       
       // Filter formData sesuai dengan menu aktif
-      let dataToSubmit: any = {};
+      let dataToSubmit: Partial<ModelData> | Partial<QuizData> = {};
       if (activeMenu === 'model3d') {
         dataToSubmit = {
           name: formData.name,
@@ -226,9 +238,10 @@ export default function AdminDashboard() {
           setFormData({ name: '', description: '', question: '', option_a: '', option_b: '', option_c: '', option_d: '', answer: '' });
         }
       }
-    } catch (err: any) {
-      console.error('Error:', err);
-      alert(`Terjadi kesalahan! ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Error:', error);
+      alert(`Terjadi kesalahan! ${error.message}`);
     }
     setLoading(false);
   };
@@ -275,7 +288,7 @@ export default function AdminDashboard() {
             <Button
               onClick={handleLogout}
               variant="ghost"
-              className="w-full justify-start text-red-600 hover:bg-red-600 hover:text-white"
+              className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
             >
               <LogOut className="w-5 h-5 mr-2" />
               Logout
@@ -309,7 +322,7 @@ export default function AdminDashboard() {
                 onClick={handleLogout}
                 variant="ghost"
                 size="sm"
-                className="text-red-600 hover:bg-red-600 hover:text-white"
+                className="text-red-600 hover:bg-red-50 hover:text-red-700"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
