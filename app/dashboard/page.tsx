@@ -23,7 +23,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import supabase from "../api/lib/db";
-import { Idesc, IQuiz } from '../api/types/desc';
+
+// Type Definitions
+interface ModelData {
+  id: number;
+  name: string;
+  description: string;
+}
+
+interface QuizData {
+  id: number;
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  answer: string;
+}
+
+type TableData = ModelData | QuizData;
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -31,12 +49,12 @@ export default function AdminDashboard() {
   const [userName, setUserName] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeMenu, setActiveMenu] = useState('model3d');
-  const [models, setModels] = useState<Idesc[]>([]);
-  const [quiz, setquiz] = useState<IQuiz[]>([]);
+  const [models, setModels] = useState<ModelData[]>([]);
+  const [quiz, setquiz] = useState<QuizData[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
+  const [currentItem, setCurrentItem] = useState<TableData | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -105,14 +123,14 @@ export default function AdminDashboard() {
     setModalOpen(true);
   };
 
-  const handleEdit = (item) => {
+  const handleEdit = (item: TableData) => {
     setEditMode(true);
     setCurrentItem(item);
-    setFormData(item);
+    setFormData(item as any);
     setModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     if (!confirm('Yakin ingin menghapus data ini?')) return;
     
     setLoading(true);
@@ -139,7 +157,7 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -147,7 +165,7 @@ export default function AdminDashboard() {
       const table = activeMenu === 'model3d' ? 'infoar' : 'quiz';
       
       // Filter formData sesuai dengan menu aktif
-      let dataToSubmit = {};
+      let dataToSubmit: any = {};
       if (activeMenu === 'model3d') {
         dataToSubmit = {
           name: formData.name,
@@ -164,7 +182,7 @@ export default function AdminDashboard() {
         };
       }
       
-      if (editMode) {
+      if (editMode && currentItem) {
         // Update data
         const { data, error } = await supabase
           .from(table)
@@ -208,7 +226,7 @@ export default function AdminDashboard() {
           setFormData({ name: '', description: '', question: '', option_a: '', option_b: '', option_c: '', option_d: '', answer: '' });
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error:', err);
       alert(`Terjadi kesalahan! ${err.message}`);
     }
@@ -257,7 +275,7 @@ export default function AdminDashboard() {
             <Button
               onClick={handleLogout}
               variant="ghost"
-              className="w-full justify-start text-red-600 hover:bg-red-600 hover:text-white"
+              className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
             >
               <LogOut className="w-5 h-5 mr-2" />
               Logout
@@ -291,7 +309,7 @@ export default function AdminDashboard() {
                 onClick={handleLogout}
                 variant="ghost"
                 size="sm"
-                className="text-red-600 hover:bg-red-600 hover:text-white"
+                className="text-red-600 hover:bg-red-50 hover:text-red-700"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -355,21 +373,21 @@ export default function AdminDashboard() {
                           <TableCell>{item.id}</TableCell>
                           {activeMenu === 'model3d' ? (
                             <>
-                              <TableCell>{item.name}</TableCell>
+                              <TableCell>{'name' in item ? item.name : ''}</TableCell>
                               <TableCell className="text-sm text-gray-600 max-w-xs truncate">
-                                {item.description && item.description.length > 50 
+                                {'description' in item && item.description && item.description.length > 50 
                                   ? `${item.description.substring(0, 50)}...` 
-                                  : item.description}
+                                  : 'description' in item ? item.description : ''}
                               </TableCell>
                             </>
                           ) : (
                             <>
-                              <TableCell>{item.question}</TableCell>
-                              <TableCell>{item.option_a}</TableCell>
-                              <TableCell>{item.option_b}</TableCell>
-                              <TableCell>{item.option_c}</TableCell>
-                              <TableCell>{item.option_d}</TableCell>
-                              <TableCell className="font-semibold">{item.answer}</TableCell>
+                              <TableCell>{'question' in item ? item.question : ''}</TableCell>
+                              <TableCell>{'option_a' in item ? item.option_a : ''}</TableCell>
+                              <TableCell>{'option_b' in item ? item.option_b : ''}</TableCell>
+                              <TableCell>{'option_c' in item ? item.option_c : ''}</TableCell>
+                              <TableCell>{'option_d' in item ? item.option_d : ''}</TableCell>
+                              <TableCell className="font-semibold">{'answer' in item ? item.answer : ''}</TableCell>
                             </>
                           )}
                           <TableCell>
