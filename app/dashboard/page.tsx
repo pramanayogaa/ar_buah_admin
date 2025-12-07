@@ -275,7 +275,7 @@ export default function AdminDashboard() {
             <Button
               onClick={handleLogout}
               variant="ghost"
-              className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="w-full justify-start text-red-600 hover:bg-red-600 hover:text-white"
             >
               <LogOut className="w-5 h-5 mr-2" />
               Logout
@@ -309,7 +309,7 @@ export default function AdminDashboard() {
                 onClick={handleLogout}
                 variant="ghost"
                 size="sm"
-                className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                className="text-red-600 hover:bg-red-600 hover:text-white"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
