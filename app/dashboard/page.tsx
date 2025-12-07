@@ -138,7 +138,34 @@ export default function AdminDashboard() {
   const handleEdit = (item: TableData) => {
     setEditMode(true);
     setCurrentItem(item);
-    setFormData(item as FormDataType);
+    
+    // Safely convert item to FormDataType
+    if ('name' in item) {
+      // Model data
+      setFormData({
+        name: item.name,
+        description: item.description,
+        question: '',
+        option_a: '',
+        option_b: '',
+        option_c: '',
+        option_d: '',
+        answer: ''
+      });
+    } else {
+      // Quiz data
+      setFormData({
+        name: '',
+        description: '',
+        question: item.question,
+        option_a: item.option_a,
+        option_b: item.option_b,
+        option_c: item.option_c,
+        option_d: item.option_d,
+        answer: item.answer
+      });
+    }
+    
     setModalOpen(true);
   };
 
