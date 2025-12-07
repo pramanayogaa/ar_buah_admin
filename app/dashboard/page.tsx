@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import supabase from "../api/lib/db";
+import { Idesc, IQuiz } from '../api/types/desc';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -30,8 +31,8 @@ export default function AdminDashboard() {
   const [userName, setUserName] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeMenu, setActiveMenu] = useState('model3d');
-  const [models, setModels] = useState([]);
-  const [quiz, setquiz] = useState([]);
+  const [models, setModels] = useState<Idesc[]>([]);
+  const [quiz, setquiz] = useState<IQuiz[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
