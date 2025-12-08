@@ -91,7 +91,7 @@ export default function AdminDashboard() {
     }
   }, [router]);
 
-  // Fetch Data when authenticated or menu changes
+  // Fetch Data ketika authentication berhasil
   useEffect(() => {
     if (!isAuthenticated) return;
     
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
     setEditMode(true);
     setCurrentItem(item);
     
-    // Safely convert item to FormDataType
+    // Convert item ke FormDataType
     if ('name' in item) {
       // Model data
       setFormData({
@@ -276,7 +276,7 @@ export default function AdminDashboard() {
 
   const tableData = activeMenu === 'model3d' ? models : quiz;
 
-  // Show loading while checking authentication
+  // Animasi loading ketika authentication
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-200 flex items-center justify-center">

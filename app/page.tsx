@@ -8,12 +8,12 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // Cek jika user sudah login, redirect ke dashboard
+    // Cek jika user sudah login, otomatis pindah ke dashboard
     const user = sessionStorage.getItem('user');
     if (user) {
       router.push('/dashboard');
     }
-  }, [router]); // Remove 'supabase' from dependency
+  }, [router]);
 
   return <LoginPage />;
 }
