@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Menu, Plus, Edit, Trash2, Save, LogOut } from 'lucide-react';
 import {
@@ -84,42 +84,43 @@ export default function AdminDashboard() {
     if (!user) {
       router.push('/');
     } else {
-      setIsAuthenticated(true);
       const userData = JSON.parse(user);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsAuthenticated(true);
       setUserName(userData.name);
     }
   }, [router]);
 
-  // Fetch Data Function (using useCallback to avoid dependency issues)
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      if (activeMenu === 'model3d') {
-        const { data, error } = await supabase.from('infoar').select('*');
-        if (error) {
-          console.error('Error fetching models:', error);
-        } else {
-          setModels(data || []);
-        }
-      } else {
-        const { data, error } = await supabase.from('quiz').select('*');
-        if (error) {
-          console.error('Error fetching quiz:', error);
-        } else {
-          setquiz(data || []);
-        }
-      }
-    } catch (err) {
-      console.error('Error:', err);
-    }
-    setLoading(false);
-  }, [activeMenu]);
-
+  // Fetch Data when authenticated or menu changes
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchData();
-    }
-  }, [isAuthenticated, fetchData]);
+    if (!isAuthenticated) return;
+    
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        if (activeMenu === 'model3d') {
+          const { data, error } = await supabase.from('infoar').select('*');
+          if (error) {
+            console.error('Error fetching models:', error);
+          } else {
+            setModels(data || []);
+          }
+        } else {
+          const { data, error } = await supabase.from('quiz').select('*');
+          if (error) {
+            console.error('Error fetching quiz:', error);
+          } else {
+            setquiz(data || []);
+          }
+        }
+      } catch (err) {
+        console.error('Error:', err);
+      }
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [isAuthenticated, activeMenu]);
 
   const handleLogout = () => {
     if (confirm('Yakin ingin logout?')) {
